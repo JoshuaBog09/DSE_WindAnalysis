@@ -74,6 +74,11 @@ def main():
                     index_col=False, parse_dates=['DTG'], date_parser=dateparse)
     df = f.set_index('DTG')
 
+    '''Specify Season'''
+    # Spring
+    start_spring = pd.to_datetime('2004-03-20', format='%Y-%m-%d %H:%M:%S.%f')
+    end_spring = pd.to_datetime('2004-06-20', format='%Y-%m-%d %H:%M:%S.%f')
+
     # Summer
     start_summer = pd.to_datetime('2004-06-21', format='%Y-%m-%d %H:%M:%S.%f')
     end_summer = pd.to_datetime('2004-09-23', format='%Y-%m-%d %H:%M:%S.%f')
@@ -122,6 +127,7 @@ def main():
     plt.legend()
     plt.show()
 
+    # 4 seasons Box plots F010
     new = pd.DataFrame([spring.data["F010"], summer.data["F010"], fall.data["F010"], winter.data["F010"]]).transpose()
     new.set_axis(['Spring', 'Summer', 'Fall', 'Winter'], axis=1, inplace=True)
 
@@ -129,12 +135,14 @@ def main():
     plt.ylabel("Wind velocity [m/s]")
     plt.show()
 
+    # 4 seasons Box plots F200
     new = pd.DataFrame([spring.data["F200"], summer.data["F200"], fall.data["F200"], winter.data["F200"]]).transpose()
     new.set_axis(['Spring', 'Summer', 'Fall', 'Winter'], axis=1, inplace=True)
 
     new.boxplot(column=["Spring", "Summer", "Fall", "Winter"])
     plt.ylabel("Wind velocity [m/s]")
     plt.show()
+
 
     df_spring = df[((df.index.month == 3) & (df.index.day >= 20)) | (
                 (df.index.month == 4) | (df.index.month == 5) | ((df.index.month == 6) & (df.index.day < 21)))]
