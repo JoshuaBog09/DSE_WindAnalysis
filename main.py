@@ -7,14 +7,18 @@ import datetime
 
 class Wind:
 
-    def __init__(self, data, start, end, label: str):
-        self.data = data.loc[(data['DTG'] >= start) & (data['DTG'] < end)]
+    cut_in = 3
+    cut_out = 25
+
+    def __init__(self, data, label: str):
+        self.data = data
         self.label = label
+
 
     def plot_histogram(self, height: str) -> None:
         plt.hist(self.data[f"F{height}"], bins=list(range(0, 45)), density=True)
-        plt.axvline(3, color='k', linestyle='dashed', linewidth=1)
-        plt.axvline(25, color='k', linestyle='dashed', linewidth=1)
+        plt.axvline(Wind.cut_in, color='k', linestyle='dashed', linewidth=1)
+        plt.axvline(Wind.cut_out, color='k', linestyle='dashed', linewidth=1)
         # plt.show()
 
     def plot_velocities(self, height: str) -> None:
@@ -37,7 +41,11 @@ class Wind:
 
         for veloc, alt in zip(velocity, altitude):
             percentage = len(veloc[(3 <= veloc) & (veloc <= 25)]) / len(veloc)
-            print(f"for altitude {alt} the precentage is {percentage}")
+            print(f"for altitude {alt} the percentage is {percentage}")
+
+    @classmethod
+    def cls_from_period(cls, data, start, end, label):
+        return cls(data.loc[(data['DTG'] >= start) & (data['DTG'] < end)], label)
 
 def main():
     head = ["DTG",
@@ -86,10 +94,10 @@ def main():
     start_winter = pd.to_datetime('2004-12-22', format='%Y-%m-%d %H:%M:%S.%f')
     end_winter = pd.to_datetime('2005-03-20', format='%Y-%m-%d %H:%M:%S.%f')
 
-    spring = Wind(f, start_spring, end_spring, "spring")
-    summer = Wind(f, start_summer, end_summer, "summer")
-    fall = Wind(f, start_fall, end_fall, "fall")
-    winter = Wind(f, start_winter, end_winter, "winter")
+    spring = Wind.cls_from_period(f, start_spring, end_spring, "spring")
+    summer = Wind.cls_from_period(f, start_summer, end_summer, "summer")
+    fall = Wind.cls_from_period(f, start_fall, end_fall, "fall")
+    winter = Wind.cls_from_period(f, start_winter, end_winter, "winter")
 
     spring.plot_histogram("010")
     plt.show()
