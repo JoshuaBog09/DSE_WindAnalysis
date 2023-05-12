@@ -44,6 +44,10 @@ class Wind:
             percentage = len(veloc[(3 <= veloc) & (veloc <= 25)]) / len(veloc)
             print(f"for altitude {alt} the percentage is {percentage}")
 
+    def plot_boxplot(self, height: str) -> None:
+        # self.data.boxplot(column=[f"F{height}"])
+        plt.boxplot(self.data[f"F{height}"])
+
     @staticmethod
     def show_plots():
         plt.legend()
@@ -136,6 +140,12 @@ def main():
     plt.legend()
     plt.show()
 
+    new = pd.DataFrame([spring.data["F010"], summer.data["F010"], fall.data["F010"], winter.data["F010"]]).transpose()
+    new.set_axis(['Spring', 'Summer', 'Fall', 'Winter'], axis=1, inplace=True)
+
+    new.boxplot(column=["Spring", "Summer", "Fall", "Winter"])
+    plt.ylabel("Wind velocity [m/s]")
+    plt.show()
 
     df_spring = df[((df.index.month == 3) & (df.index.day >= 20)) | (
                 (df.index.month == 4) | (df.index.month == 5) | ((df.index.month == 6) & (df.index.day < 21)))]
