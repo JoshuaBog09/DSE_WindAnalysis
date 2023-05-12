@@ -147,6 +147,13 @@ def main():
     plt.ylabel("Wind velocity [m/s]")
     plt.show()
 
+    new = pd.DataFrame([spring.data["F200"], summer.data["F200"], fall.data["F200"], winter.data["F200"]]).transpose()
+    new.set_axis(['Spring', 'Summer', 'Fall', 'Winter'], axis=1, inplace=True)
+
+    new.boxplot(column=["Spring", "Summer", "Fall", "Winter"])
+    plt.ylabel("Wind velocity [m/s]")
+    plt.show()
+
     df_spring = df[((df.index.month == 3) & (df.index.day >= 20)) | (
                 (df.index.month == 4) | (df.index.month == 5) | ((df.index.month == 6) & (df.index.day < 21)))]
 
