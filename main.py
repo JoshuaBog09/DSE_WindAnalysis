@@ -14,12 +14,13 @@ class Wind:
         self.data = data
         self.label = label
 
-
     def plot_histogram(self, height: str) -> None:
-        plt.hist(self.data[f"F{height}"], bins=list(range(0, 45)), density=True)
+
+        plt.hist(self.data[f"F{height}"], bins=list(range(0, 35)), density=True, label=f"Alt = {height}", alpha=0.2)
         plt.axvline(Wind.cut_in, color='k', linestyle='dashed', linewidth=1)
         plt.axvline(Wind.cut_out, color='k', linestyle='dashed', linewidth=1)
-        # plt.show()
+        plt.xlabel(f"Wind velocity bins")
+        plt.ylabel(f"Frequency")
 
     def plot_velocities(self, height: str) -> None:
         plt.plot(self.data["DTG"], self.data[f"F{height}"])
@@ -42,6 +43,11 @@ class Wind:
         for veloc, alt in zip(velocity, altitude):
             percentage = len(veloc[(3 <= veloc) & (veloc <= 25)]) / len(veloc)
             print(f"for altitude {alt} the percentage is {percentage}")
+
+    @staticmethod
+    def show_plots():
+        plt.legend()
+        plt.show()
 
     @classmethod
     def cls_from_period(cls, data, start, end, label):
@@ -100,13 +106,20 @@ def main():
     winter = Wind.cls_from_period(f, start_winter, end_winter, "winter")
 
     spring.plot_histogram("010")
-    plt.show()
+    spring.plot_histogram("200")
+    spring.show_plots()
+
     summer.plot_histogram("010")
-    plt.show()
+    summer.plot_histogram("200")
+    summer.show_plots()
+
     fall.plot_histogram("010")
-    plt.show()
+    fall.plot_histogram("200")
+    fall.show_plots()
+
     winter.plot_histogram("010")
-    plt.show()
+    winter.plot_histogram("200")
+    winter.show_plots()
 
     # spring.plot_velocities("010")
 
