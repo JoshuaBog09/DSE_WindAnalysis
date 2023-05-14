@@ -16,15 +16,21 @@ class Wind:
 
     def plot_histogram(self, height: str) -> None:
 
-        plt.hist(self.data[f"F{height}"], bins=list(range(0, 35)), density=True, label=f"Alt = {height}", alpha=0.2)
-        plt.axvline(Wind.cut_in, color='k', linestyle='dashed', linewidth=1)
-        plt.axvline(Wind.cut_out, color='k', linestyle='dashed', linewidth=1)
-        plt.xlabel(f"Wind velocity bins")
-        plt.ylabel(f"Frequency")
+        plt.hist(self.data[f"F{height}"], bins=list(range(0, 35)),
+                 density=True, label=f"Alt = {height}", alpha=0.4)
+        plt.xlabel(f"Wind velocity bins [m/s]")
+        plt.ylabel(f"Frequency [-]")
+
+    def plot_weibull(self, height: str, color: str) -> None:
+        alt = self.data[f"F{height}"].sort_values()
+        para1, para2, para3 = stats.weibull_min.fit(alt, floc=0)
+        plt.plot(alt, stats.weibull_min.pdf(alt, para1, para2, para3), color=color)
+        plt.axvline(np.median(alt), color=color, linestyle='dashed', linewidth=1)
 
     def plot_velocities(self, height: str) -> None:
         plt.plot(self.data["DTG"], self.data[f"F{height}"])
-        # plt.show()
+        plt.xlabel(f"Time")
+        plt.ylabel(f"Wind velocity")
 
     def plot_velocityprofile(self) -> None:
         altitude = [10, 20, 40, 60, 80, 100, 150, 200]
@@ -32,6 +38,8 @@ class Wind:
                     np.percentile(self.data['F060'], 50), np.percentile(self.data['F080'],50), np.percentile(self.data['F100'],50),
                     np.percentile(self.data['F150'], 50), np.percentile(self.data['F200'],50)]
         plt.plot(velocity, altitude, label=self.label)
+        plt.xlabel(f"Wind velocity [m/s]")
+        plt.ylabel(f"Height above sea level [m]")
 
     def plot_velocityprofileV2(self) -> None:
 
@@ -49,6 +57,11 @@ class Wind:
         plt.boxplot(self.data[f"F{height}"])
 
     @staticmethod
+    def plot_operationalwindow() -> None:
+        plt.axvline(Wind.cut_in, color='k', linestyle='dashed', linewidth=1)
+        plt.axvline(Wind.cut_out, color='k', linestyle='dashed', linewidth=1)
+
+    @staticmethod
     def show_plots():
         plt.legend()
         plt.show()
@@ -57,7 +70,7 @@ class Wind:
     def cls_from_period(cls, data, start, end, label):
         return cls(data.loc[(data['DTG'] >= start) & (data['DTG'] < end)], label)
 
-def main():
+def main_SingleYear():
     head = ["DTG",
             "F010", "D010", "T010", "Q010", "P010",
             "F020", "D020", "T020", "Q020", "P020",
@@ -90,42 +103,33 @@ def main():
     # Winter
     start_winter = pd.to_datetime('2004-12-22', format='%Y-%m-%d %H:%M:%S.%f')
     end_winter = pd.to_datetime('2005-03-20', format='%Y-%m-%d %H:%M:%S.%f')
+    '''End Specify Season'''
 
     spring = Wind.cls_from_period(f, start_spring, end_spring, "spring")
     summer = Wind.cls_from_period(f, start_summer, end_summer, "summer")
     fall = Wind.cls_from_period(f, start_fall, end_fall, "fall")
     winter = Wind.cls_from_period(f, start_winter, end_winter, "winter")
 
-    spring.plot_histogram("010")
-    spring.plot_histogram("200")
-    spring.show_plots()
+    seasons = [spring, summer, fall, winter]
 
-    summer.plot_histogram("010")
-    summer.plot_histogram("200")
-    summer.show_plots()
-
-    fall.plot_histogram("010")
-    fall.plot_histogram("200")
-    fall.show_plots()
-
-    winter.plot_histogram("010")
-    winter.plot_histogram("200")
-    winter.show_plots()
-
-    # spring.plot_velocities("010")
+    for season in seasons:
+        season.plot_histogram("010")
+        season.plot_weibull("010", "blue")
+        season.plot_histogram("200")
+        season.plot_weibull("200", "red")
+        season.plot_operationalwindow()
+        season.show_plots()
 
     spring.plot_velocityprofile()
     summer.plot_velocityprofile()
     fall.plot_velocityprofile()
     winter.plot_velocityprofile()
+    Wind.show_plots()
 
     spring.plot_velocityprofileV2()
     summer.plot_velocityprofileV2()
     fall.plot_velocityprofileV2()
     winter.plot_velocityprofileV2()
-
-    plt.legend()
-    plt.show()
 
     # 4 seasons Box plots F010
     new = pd.DataFrame([spring.data["F010"], summer.data["F010"], fall.data["F010"], winter.data["F010"]]).transpose()
@@ -140,9 +144,27 @@ def main():
     new.set_axis(['Spring', 'Summer', 'Fall', 'Winter'], axis=1, inplace=True)
 
     new.boxplot(column=["Spring", "Summer", "Fall", "Winter"])
+    plt.xlabel("Season")
     plt.ylabel("Wind velocity [m/s]")
     plt.show()
 
+def main_MultiYear():
+
+    head = ["DTG",
+            "F010", "D010", "T010", "Q010", "P010",
+            "F020", "D020", "T020", "Q020", "P020",
+            "F040", "D040", "T040", "Q040", "P040",
+            "F060", "D060", "T060", "Q060", "P060",
+            "F080", "D080", "T080", "Q080", "P080",
+            "F100", "D100", "T100", "Q100", "P100",
+            "F150", "D150", "T150", "Q150", "P150",
+            "F200", "D200", "T200", "Q200", "P200"]
+
+    dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d %H:%M')
+
+    f = pd.read_csv('Data/MMIJ_2004-2013.csv', delimiter='\t', comment='#', encoding='utf-8', header=None, names=head,
+                    index_col=False, parse_dates=['DTG'], date_parser=dateparse)
+    df = f.set_index('DTG')
 
     df_spring = df[((df.index.month == 3) & (df.index.day >= 20)) | (
                 (df.index.month == 4) | (df.index.month == 5) | ((df.index.month == 6) & (df.index.day < 21)))]
@@ -259,8 +281,47 @@ def main():
     plot_hist_weibull_season(df_fall)
     plot_hist_weibull_season(df_winter)
 
+    # 4 seasons Box plots F010
+    new = pd.DataFrame([df_spring["F010"], df_summer["F010"], df_fall["F010"], df_winter["F010"]]).transpose()
+    new.set_axis(['Spring', 'Summer', 'Fall', 'Winter'], axis=1, inplace=True)
+
+    new.boxplot(column=["Spring", "Summer", "Fall", "Winter"])
+    plt.ylabel("Wind velocity [m/s]")
+    plt.show()
+
+    # 4 seasons Box plots F200
+    new = pd.DataFrame([df_spring["F200"], df_summer["F200"], df_fall["F200"], df_winter["F200"]]).transpose()
+    new.set_axis(['Spring', 'Summer', 'Fall', 'Winter'], axis=1, inplace=True)
+
+    new.boxplot(column=["Spring", "Summer", "Fall", "Winter"])
+    plt.xlabel("Season")
+    plt.ylabel("Wind velocity [m/s]")
+    plt.show()
+
+    # Compute pie slices
+    N = 24
+    dir_list = [0]*N
+    theta = np.linspace(0.0, 2 * np.pi, N, endpoint=False)
+
+    for id, direction in enumerate(f["D040"]):
+        dir_list[int(direction//15)] += 1
+
+    dir_list = np.array(dir_list)
+    radii = dir_list / len(f["D200"])
+    width = 2 * np.pi / 24
+
+    ax = plt.subplot(111, projection='polar')
+    bars = ax.bar(theta, radii, width=width, bottom=0.0)
+
+    # Use custom colors and opacity
+    for r, bar in zip(radii, bars):
+        bar.set_facecolor(plt.cm.viridis(r / 10.))
+        bar.set_alpha(0.5)
+
+    plt.show()
+
 
 if __name__ == '__main__':
-    main()
+    main_MultiYear()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
