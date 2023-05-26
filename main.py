@@ -163,8 +163,8 @@ def main_MultiYear():
                     index_col=False, parse_dates=['DTG'], date_parser=dateparse)
     df = f.set_index('DTG')
 
-    print(f"period average: {np.mean(df['F010'])}")
-    print(f"period average: {np.mean(df['F200'])}")
+    print(f"period average: {np.median(df['F010'])}")
+    print(f"period average: {np.median(df['F200'])}")
 
     df_spring = df[((df.index.month == 3) & (df.index.day >= 20)) | (
                 (df.index.month == 4) | (df.index.month == 5) | ((df.index.month == 6) & (df.index.day < 21)))]
@@ -178,14 +178,14 @@ def main_MultiYear():
     df_winter = df[((df.index.month == 12) & (df.index.day >= 22)) | (
             (df.index.month == 1) | (df.index.month == 2) | ((df.index.month == 3) & (df.index.day < 20)))]
 
-    print(f"spring average: {np.mean(df_spring['F010'])}")
-    print(f"spring average: {np.mean(df_spring['F200'])}")
-    print(f"summer average: {np.mean(df_summer['F010'])}")
-    print(f"summer average: {np.mean(df_summer['F200'])}")
-    print(f"fall average: {np.mean(df_fall['F010'])}")
-    print(f"fall average: {np.mean(df_fall['F200'])}")
-    print(f"winter average: {np.mean(df_winter['F010'])}")
-    print(f"winter average: {np.mean(df_winter['F200'])}")
+    print(f"spring average: {np.median(df_spring['F010'])}")
+    print(f"spring average: {np.median(df_spring['F200'])}")
+    print(f"summer average: {np.median(df_summer['F010'])}")
+    print(f"summer average: {np.median(df_summer['F200'])}")
+    print(f"fall average: {np.median(df_fall['F010'])}")
+    print(f"fall average: {np.median(df_fall['F200'])}")
+    print(f"winter average: {np.median(df_winter['F010'])}")
+    print(f"winter average: {np.median(df_winter['F200'])}")
 
     period = Wind(df, "Full Period")
     spring = Wind(df_spring, "spring")
@@ -203,10 +203,10 @@ def main_MultiYear():
         season.plot_operationalwindow()
         season.show_plots()
 
-    spring.plot_velocityprofile()
-    summer.plot_velocityprofile()
-    fall.plot_velocityprofile()
-    winter.plot_velocityprofile()
+    # spring.plot_velocityprofile()
+    # summer.plot_velocityprofile()
+    # fall.plot_velocityprofile()
+    # winter.plot_velocityprofile()
     period.plot_velocityprofile()
     Wind.show_plots()
 
@@ -248,76 +248,6 @@ def main_MultiYear():
     # plt.plot(h_axis, average_f200)
     # plt.show()
 
-
-
-    # df.iloc[start_year]
-
-    # # Group the DataFrame by year and store in a dictionary
-    # df_spring_year = {year: group for year, group in df_spring.groupby(pd.Grouper(freq='Y'))}
-    # print(df_summer,'\n',df_fall,'\n', df_winter)
-
-    # '''Define function to plot'''
-    # def plot_hist_weibull_alt10(data):
-    #     alt = data['F010'].sort_values()
-    #     para1, para2, para3 = stats.weibull_min.fit(alt, floc=0)
-    #     alt.hist(alpha = 0.4, density = True, bins = 30)
-    #     plt.plot(alt, stats.weibull_min.pdf(alt, para1, para2, para3), color ='blue', label = '10m Altitude')
-    #     plt.axvline(np.median(alt), color='blue', linestyle='dashed', linewidth=1)
-    #
-    # def plot_hist_weibull_alt200(data):
-    #     alt = data['F200'].sort_values()
-    #     para1, para2, para3 = stats.weibull_min.fit(alt, floc=0)
-    #     alt.hist(alpha=0.4, density=True, bins=30)
-    #     plt.plot(alt, stats.weibull_min.pdf(alt, para1, para2, para3), color = 'red', label = '200m ALtitude')
-    #     plt.axvline(np.median(alt), color='red', linestyle='dashed', linewidth=1)
-    #
-    # def plot_hist_weibull_season(data):
-    #     plot_hist_weibull_alt10(data)
-    #     plot_hist_weibull_alt200(data)
-    #     plt.axvline(3, color='k', linestyle='dashed', linewidth=1)
-    #     plt.axvline(25, color='k', linestyle='dashed', linewidth=1)
-    #     plt.legend()
-    #     plt.show()
-    #
-    # def plot_hist_weibull_alt010_2(data1, data2, data3, data4):
-    #     alt_010_1 = data1['F010'].sort_values()
-    #     para11, para21, para31 = stats.weibull_min.fit(alt_010_1, floc=0)
-    #     alt_010_2 = data2['F010'].sort_values()
-    #     para12, para22, para32 = stats.weibull_min.fit(alt_010_2, floc=0)
-    #     alt_010_3 = data3['F010'].sort_values()
-    #     para13, para23, para33 = stats.weibull_min.fit(alt_010_3, floc=0)
-    #     alt_010_4 = data4['F010'].sort_values()
-    #     para14, para24, para34 = stats.weibull_min.fit(alt_010_4, floc=0)
-    #     plt.plot(alt_010_1, stats.weibull_min.pdf(alt_010_1, para11, para21, para31))
-    #     plt.plot(alt_010_2, stats.weibull_min.pdf(alt_010_2, para12, para22, para32))
-    #     plt.plot(alt_010_3, stats.weibull_min.pdf(alt_010_3, para13, para23, para33))
-    #     plt.plot(alt_010_4, stats.weibull_min.pdf(alt_010_4, para14, para24, para34))
-    #     plt.axvline(3, color='k', linestyle='dashed', linewidth=1)
-    #     plt.axvline(25, color='k', linestyle='dashed', linewidth=1)
-    #     plt.show()
-    #
-    # def plot_hist_weibull_alt200_2(data1, data2, data3, data4):
-    #     alt_010_1 = data1['F200'].sort_values()
-    #     para11, para21, para31 = stats.weibull_min.fit(alt_010_1, floc=0)
-    #     alt_010_2 = data2['F200'].sort_values()
-    #     para12, para22, para32 = stats.weibull_min.fit(alt_010_2, floc=0)
-    #     alt_010_3 = data3['F200'].sort_values()
-    #     para13, para23, para33 = stats.weibull_min.fit(alt_010_3, floc=0)
-    #     alt_010_4 = data4['F200'].sort_values()
-    #     para14, para24, para34 = stats.weibull_min.fit(alt_010_4, floc=0)
-    #     plt.plot(alt_010_1, stats.weibull_min.pdf(alt_010_1, para11, para21, para31))
-    #     plt.plot(alt_010_2, stats.weibull_min.pdf(alt_010_2, para12, para22, para32))
-    #     plt.plot(alt_010_3, stats.weibull_min.pdf(alt_010_3, para13, para23, para33))
-    #     plt.plot(alt_010_4, stats.weibull_min.pdf(alt_010_4, para14, para24, para34))
-    #     plt.axvline(3, color='k', linestyle='dashed', linewidth=1)
-    #     plt.axvline(25, color='k', linestyle='dashed', linewidth=1)
-    #     plt.show()
-
-    # plot_hist_weibull_season(df_spring)
-    # plot_hist_weibull_season(df_summer)
-    # plot_hist_weibull_season(df_fall)
-    # plot_hist_weibull_season(df_winter)
-
     # 4 seasons Box plots F010
     new = pd.DataFrame([df_spring["F010"], df_summer["F010"], df_fall["F010"], df_winter["F010"]]).transpose()
     new.set_axis(['Spring', 'Summer', 'Fall', 'Winter'], axis=1, inplace=True)
@@ -335,12 +265,23 @@ def main_MultiYear():
     plt.ylabel("Wind velocity [m/s]")
     plt.show()
 
+    # Full period
+
+    new = pd.DataFrame([df["F010"], df["F200"]]).transpose()
+    new.set_axis(['F010', 'F200'], axis=1, inplace=True)
+
+    new.boxplot(column=['F010', 'F200'])
+    plt.xlabel("Altitude")
+    plt.ylabel("Wind velocity [m/s]")
+    plt.show()
+
+
     # Compute pie slices
     N = 24
     dir_list = [0]*N
     theta = np.linspace(0.0, 2 * np.pi, N, endpoint=False)
 
-    for id, direction in enumerate(f["D040"]):
+    for id, direction in enumerate(f["D200"]):
         dir_list[int(direction//15)] += 1
 
     dir_list = np.array(dir_list)
